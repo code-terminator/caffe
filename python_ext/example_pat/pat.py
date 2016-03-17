@@ -1,8 +1,3 @@
-
-# coding: utf-8
-
-# In[7]:
-
 """
 This function is used train the PAT model
 """
@@ -14,13 +9,9 @@ import os
 import time
 import cPickle
 from caffe.proto.caffe_pb2 import SolverParameter
-from pat_model import pat_net
+from pat_model import pat_net, pat_net_relu, pat_net_one_relu
 sys.path.append("/home/bugfree/Workspace/caffe/python_ext")
 from train import train_net
-
-
-
-# In[2]:
 
 class data_provider(object):
     """
@@ -119,9 +110,6 @@ class data_provider(object):
             self.cur_idx = end_idx
         return {'data':data, 'label':label}
 
-
-# In[3]:
-
 def get_sgd_solver(test_iter, test_interval,snapshot_prefix,\
                    lr_policy="step", base_lr=0.01, momentum=0.9, gamma=0.1,\
                    snapshot=200000, display=100, stepsize=100000, maxiter=350000):
@@ -154,9 +142,6 @@ def get_sgd_solver(test_iter, test_interval,snapshot_prefix,\
                                 snapshot=snapshot, display=display, stepsize=stepsize,\
                                                            max_iter=maxiter)
 
-
-# In[4]:
-
 def run_pat():
     #################################
     # variable you want to set
@@ -182,10 +167,10 @@ def run_pat():
     test_iter = [100]
     test_interval = 100000
     lr_policy = "step"
-    lr = 0.001
-    gamma = 0.1
-    snapshot = 250000
-    stepsize = 5000000
+    lr = 0.00002
+    gamma = 0.5
+    snapshot = 1000000
+    stepsize = 2000000
     maxiter = 10000000
 
 
@@ -201,7 +186,8 @@ def run_pat():
     train_provider = data_provider('',fcpickle=fcpickle_train, batch_size=train_batch_size)
     test_provider = data_provider('',fcpickle=fcpickle_test, batch_size=test_batch_size)
     # net = pat_net(300,33,train_batch_size,test_batch_size)
-    net = pat_net(input_dim,output_dim,train_batch_size,test_batch_size)
+    # net = pat_net(input_dim,output_dim,train_batch_size,test_batch_size)
+    net = pat_net_one_relu(input_dim,output_dim,train_batch_size,test_batch_size)
     expname = basename + "%g" % (lr)
     out_dir = "%s/%s/" %(basedir, expname)
     solver = get_sgd_solver(test_iter=test_iter, test_interval=test_interval,\
